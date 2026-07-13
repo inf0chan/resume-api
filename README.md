@@ -519,7 +519,7 @@ Output:
 
 ---
 
-# 🔢 req.params
+# req.params
 
 `req.params` stores values passed in the URL.
 
@@ -613,7 +613,7 @@ Installs Express
 
 ---
 
-# 📄 package.json
+# package.json
 
 `package.json` is the configuration file of a Node.js project.
 
@@ -640,29 +640,7 @@ Example:
 
 ---
 
-# 📁 node_modules
-
-`node_modules` contains every installed package.
-
-Example:
-
-```text
-node_modules/
-```
-
-is automatically created after:
-
-```bash
-npm install
-```
-
-You should **not upload** this folder to GitHub.
-
-Instead, add it to `.gitignore`.
-
----
-
-# 📥 require()
+# require()
 
 `require()` imports another file or package.
 
@@ -680,7 +658,7 @@ const userRoutes = require("./routes/users");
 
 ---
 
-# 📤 module.exports
+# module.exports
 
 `module.exports` allows another file to use your code.
 
@@ -694,7 +672,7 @@ Without exporting, `app.js` cannot access your routes.
 
 ---
 
-# 🔄 CRUD Operations
+# CRUD Operations
 
 CRUD represents the four basic database operations.
 
@@ -733,7 +711,7 @@ Deletes a resume.
 
 ---
 
-# 📊 HTTP Status Codes
+# HTTP Status Codes
 
 Status codes tell the client whether the request succeeded or failed.
 
@@ -771,7 +749,7 @@ res.status(204).send();
 
 ---
 
-# 🔍 API Testing
+# API Testing
 
 This project was tested using:
 
@@ -787,13 +765,7 @@ http://localhost:3000/api/templates
 
 If the server returns JSON, the route is working correctly.
 
-# 📚 API Documentation
-
-The following REST API endpoints are available in this project.
-
----
-
-# 🔐 Authentication Routes
+# Authentication Routes
 
 These routes simulate user authentication.
 
@@ -815,7 +787,7 @@ Example Response
 
 ---
 
-# 👤 User Routes
+# User Routes
 
 Manage the currently logged-in user.
 
@@ -829,7 +801,6 @@ Example Response
 
 ```json
 {
-    "success":true,
     "user":{
         "id":1,
         "name":"Info Chan",
@@ -841,7 +812,7 @@ Example Response
 
 ---
 
-# 📄 Document Routes
+# Document Routes
 
 Documents represent resumes or cover letters.
 
@@ -852,41 +823,11 @@ Documents represent resumes or cover letters.
 | POST   | `/api/documents/import`        | Import a document       |
 | GET    | `/api/documents/:id`           | Get a specific document |
 | PUT    | `/api/documents/:id`           | Update a document       |
-| POST   | `/api/documents/:id/duplicate` | Duplicate a document    |
 | DELETE | `/api/documents/:id`           | Delete a document       |
 
 ---
 
-# 📝 Sections & Items
-
-These routes manage sections inside a resume.
-
-| Method | Endpoint                                       | Description    |
-| ------ | ---------------------------------------------- | -------------- |
-| POST   | `/api/documents/:id/sections`                  | Add section    |
-| PATCH  | `/api/documents/:id/sections/:sectionId`       | Update section |
-| DELETE | `/api/documents/:id/sections/:sectionId`       | Delete section |
-| POST   | `/api/documents/:id/sections/:sectionId/items` | Add item       |
-| PATCH  | `/api/documents/:id/items/:itemId`             | Update item    |
-| DELETE | `/api/documents/:id/items/:itemId`             | Delete item    |
-
-> **Note:** These endpoints are part of the API design. They can be implemented later when adding autosave and nested editing.
-
----
-
-# 🕒 Version Routes
-
-Versioning allows users to save multiple versions of a resume.
-
-| Method | Endpoint                                         | Description          |
-| ------ | ------------------------------------------------ | -------------------- |
-| GET    | `/api/documents/:id/versions`                    | List versions        |
-| POST   | `/api/documents/:id/versions`                    | Save current version |
-| POST   | `/api/documents/:id/versions/:versionId/restore` | Restore version      |
-
----
-
-# 🎨 Template Routes
+# Template Routes
 
 Templates define the visual design of resumes.
 
@@ -903,7 +844,7 @@ Example Response
         {
             "id":1,
             "name":"Modern",
-            "category":"Professional"
+            "category":"simple"
         }
     ]
 }
@@ -911,7 +852,7 @@ Example Response
 
 ---
 
-# 🤖 AI Routes
+# AI Routes
 
 These routes currently return **mock responses**.
 
@@ -935,9 +876,9 @@ Example Response
 
 ---
 
-# 💼 Job Application Routes
+# Application Routes
 
-Track job applications.
+Track applications.
 
 | Method | Endpoint                | Description          |
 | ------ | ----------------------- | -------------------- |
@@ -948,7 +889,7 @@ Track job applications.
 
 ---
 
-# 🧪 Testing the API
+# Testing the API
 
 This project can be tested using:
 
@@ -972,48 +913,10 @@ Request Body
 
 ```json
 {
-    "email":"user@gmail.com",
-    "password":"123456"
+    "email":"info@gmail.com"
 }
 ```
-
----
-
-# 📌 HTTP Status Codes Used
-
-| Code | Meaning      |
-| ---- | ------------ |
-| 200  | OK           |
-| 201  | Created      |
-| 204  | No Content   |
-| 400  | Bad Request  |
-| 401  | Unauthorized |
-| 404  | Not Found    |
-
----
-
-# 🚀 Future Improvements
-
-This project currently uses mock responses and local JSON storage.
-
-Planned improvements include:
-
-* MongoDB Database Integration
-* JWT Authentication
-* Password Hashing with bcrypt
-* Real AI Integration (OpenAI API)
-* File Upload Support
-* Resume Export to PDF
-* Resume Sharing
-* ATS Resume Checker
-* Cloud Storage
-* Email Verification
-* Role-Based Authentication
-* Unit & Integration Testing
-
----
-
-# 📖 What I Learned
+# What I Learned
 
 During this project, I learned:
 
@@ -1031,8 +934,6 @@ During this project, I learned:
 * Modular Route Files
 * API Testing
 * Backend Development Basics
-
----
 ---
 
 # ⭐ Support
