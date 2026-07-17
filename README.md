@@ -60,22 +60,131 @@ Currently, all responses are returned in **JSON format**, and the project uses a
 ```text
 resume-api/
 │
-├── node_modules/
+├── node_modules/          # Dependencies
 │
-├── routes/
-│   ├── auth.js
-│   ├── users.js
-│   ├── documents.js
-│   ├── templates.js
-│   ├── ai.js
-│   └── applications.js
+├── models/                # Data Models
+│   ├── User.js           # User model with static methods
+│   ├── Document.js       # Document model for resumes
+│   ├── Template.js       # Template model for resume templates
+│   └── Application.js    # Application model for job tracking
 │
-├── data.json
-├── package.json
-├── package-lock.json
-├── app.js
-└── README.md
+├── controllers/          # Business Logic
+│   ├── authController.js        # Authentication logic
+│   ├── userController.js        # User profile operations
+│   ├── documentController.js    # Document CRUD operations
+│   ├── templateController.js    # Template operations
+│   ├── applicationController.js # Application tracking
+│   └── aiController.js          # AI feature logic
+│
+├── middleware/           # Middleware Functions
+│   ├── errorHandler.js         # Centralized error handling
+│   └── validationMiddleware.js # Input validation
+│
+├── routes/              # API Route Handlers
+│   ├── auth.js          # Authentication routes
+│   ├── users.js         # User profile routes
+│   ├── documents.js     # Document routes
+│   ├── templates.js     # Template routes
+│   ├── ai.js            # AI feature routes
+│   └── applications.js  # Application tracking routes
+│
+├── app.js               # Express app setup & route registration
+├── db.js                # Database handler (JSON file operations)
+├── package.json         # Dependencies and project metadata
+├── package-lock.json    # Dependency lock file
+├── data.json           # JSON data storage
+└── README.md           # Project documentation
 ```
+
+---
+
+# Architecture Overview
+
+## MVC Pattern (Models-Views-Controllers)
+
+This project follows a structured architecture with separation of concerns:
+
+### Models (`/models`)
+- Handle data operations and business logic
+- Interact with the database layer
+- Provide static methods for CRUD operations
+- Examples: `User.js`, `Document.js`, `Template.js`, `Application.js`
+
+### Controllers (`/controllers`)
+- Process HTTP requests and responses
+- Validate input data
+- Call model methods to perform operations
+- Return formatted JSON responses
+- Examples: `authController.js`, `userController.js`, `documentController.js`
+
+### Middleware (`/middleware`)
+- Pre-process requests and responses
+- Handle errors globally
+- Validate request data
+- Examples: `errorHandler.js`, `validationMiddleware.js`
+
+### Routes (`/routes`)
+- Define API endpoints and HTTP methods
+- Map requests to controller methods
+- Handle route parameters
+- Examples: `/api/auth/register`, `/api/users/me`, `/api/documents`
+
+### Database (`db.js`)
+- Manages JSON file I/O operations
+- Provides CRUD methods for all data collections
+- Loads and saves data automatically
+
+---
+
+# API Endpoints
+
+## Authentication (`/api/auth`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/register` | Register new user |
+| POST | `/login` | Authenticate user |
+| POST | `/logout` | End user session |
+| POST | `/forget-password` | Request password reset |
+| POST | `/reset-password` | Reset password with token |
+
+## Users (`/api/users`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/me` | Get current user profile |
+| PUT | `/me` | Update user profile |
+| DELETE | `/me` | Delete user account |
+
+## Documents (`/api/documents`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Get all documents |
+| POST | `/` | Create new document |
+| POST | `/import` | Import document |
+| GET | `/:id` | Get specific document |
+| PUT | `/:id` | Update document |
+| DELETE | `/:id` | Delete document |
+
+## Templates (`/api/templates`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Get all templates |
+| GET | `/:id` | Get specific template |
+
+## Applications (`/api/applications`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Get all applications |
+| POST | `/` | Create new application |
+| PATCH | `/:id` | Update application |
+| DELETE | `/:id` | Delete application |
+
+## AI Features (`/api/ai`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/bullets` | Generate bullet points |
+| POST | `/summary` | Create AI summary |
+| POST | `/rewrite` | Rewrite text |
+| POST | `/prompt` | Custom AI prompt |
 
 ---
 
@@ -916,24 +1025,256 @@ Request Body
     "email":"info@gmail.com"
 }
 ```
+# Data Models
+
+## User Object
+```json
+{
+  "id": 1,
+  "name": "Info Chan",
+  "email": "info@example.com",
+  "password": "hashed_password",
+  "plan": "Free",
+  "aiCredits": 25,
+  "createdAt": "2024-01-15T10:30:00Z"
+}
+```
+
+## Document Object
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "title": "My Resume",
+  "content": "Resume content here...",
+  "templateId": 1,
+  "createdAt": "2024-01-15T10:30:00Z"
+}
+```
+
+## Template Object
+```json
+{
+  "id": 1,
+  "name": "Modern",
+  "description": "Clean and modern resume template",
+  "category": "simple",
+  "content": "Template HTML/CSS here...",
+  "createdAt": "2024-01-15T10:30:00Z"
+}
+```
+
+## Application Object
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "companyName": "Google",
+  "position": "Frontend Developer",
+  "status": "Applied",
+  "appliedDate": "2024-01-15T10:30:00Z",
+  "createdAt": "2024-01-15T10:30:00Z"
+}
+```
+
+---
+
+# Example Requests and Responses
+
+## Register User
+**Request:**
+```bash
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "secure123",
+  "name": "John Doe"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "User Registered",
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "user@example.com",
+    "plan": "Free",
+    "aiCredits": 25
+  }
+}
+```
+
+## Create Document
+**Request:**
+```bash
+POST /api/documents
+Content-Type: application/json
+
+{
+  "title": "My Professional Resume",
+  "content": "Experience: ...",
+  "templateId": 1
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Document created successfully",
+  "document": {
+    "id": 1,
+    "userId": 1,
+    "title": "My Professional Resume",
+    "templateId": 1,
+    "createdAt": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+## Get Templates
+**Request:**
+```bash
+GET /api/templates
+```
+
+**Response:**
+```json
+{
+  "message": "templates listing successfully",
+  "templates": [
+    {
+      "id": 1,
+      "name": "Modern",
+      "category": "simple"
+    },
+    {
+      "id": 2,
+      "name": "Creative",
+      "category": "designer"
+    }
+  ]
+}
+```
+
+---
+
+# Best Practices
+
+## Controllers
+- Always validate input before processing
+- Use try-catch blocks for error handling
+- Return appropriate HTTP status codes
+- Provide meaningful error messages
+- Keep controllers focused on request/response handling
+
+## Models
+- Keep models focused on data operations
+- Use static methods for data access
+- Maintain consistent method naming
+- Handle errors gracefully
+
+## Middleware
+- Use middleware for cross-cutting concerns
+- Order middleware correctly in app.js
+- Keep middleware focused and reusable
+- Document middleware functionality
+
+## Routes
+- Use descriptive route names
+- Organize routes by feature
+- Document all endpoints with comments
+- Use consistent HTTP methods
+
+## Database
+- Always save after modifications
+- Handle file read/write errors
+- Use proper data validation
+- Backup data regularly
+
+---
+
+# Error Handling
+
+The API uses standardized HTTP status codes and error responses:
+
+### Error Response Format
+```json
+{
+  "error": "Error message here",
+  "status": 400
+}
+```
+
+### Common Errors
+
+**400 Bad Request**
+- Missing required fields
+- Invalid email format
+- Invalid data type
+
+**404 Not Found**
+- User doesn't exist
+- Document not found
+- Resource not found
+
+**409 Conflict**
+- User already exists
+- Duplicate entry
+
+**500 Internal Server Error**
+- Database operation failed
+- Unexpected server error
+
+---
+
+# Future Improvements
+
+- [ ] Add database support (MongoDB/PostgreSQL)
+- [ ] Implement JWT authentication
+- [ ] Add password hashing (bcrypt)
+- [ ] Integrate real AI service
+- [ ] Add file upload functionality
+- [ ] Implement rate limiting
+- [ ] Add request validation middleware
+- [ ] Create unit tests
+- [ ] Add API documentation (Swagger)
+- [ ] Implement caching
+- [ ] Add logging system
+- [ ] Email verification
+- [ ] Two-factor authentication
+
+---
+
 # What I Learned
 
 During this project, I learned:
 
 * Node.js fundamentals
-* Express.js
+* Express.js framework
 * REST API development
 * CRUD operations
-* Express Routing
-* Middleware
-* JSON handling
+* Express Routing and Middleware
+* JSON data handling
 * Request & Response objects
-* HTTP Methods
-* HTTP Status Codes
-* Project Structure
-* Modular Route Files
-* API Testing
-* Backend Development Basics
+* HTTP Methods and Status Codes
+* Project structure and organization
+* Modular route files and separation of concerns
+* API testing with tools like Postman
+* Backend development basics
+* MVC architecture pattern
+* Error handling strategies
+* Code organization and best practices
+
+---
+
+# Contributing
+
+This is a learning project. Feel free to fork, modify, and learn from it!
+
 ---
 
 # ⭐ Support
