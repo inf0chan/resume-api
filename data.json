@@ -1,6 +1,112 @@
 {
-  "users": [],
-  "documents": [],
-  "templates": [],
-  "applications": []
+  "users": [
+    {
+      "id": 1,
+      "name": "Info Chan",
+      "email": "info@example.com",
+      "password": "password123",
+      "plan": "Free",
+      "aiCredits": 25,
+      "createdAt": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Alpha Romeo",
+      "email": "Aromeo@example.com",
+      "password": "secure456",
+      "plan": "Premium",
+      "aiCredits": 100,
+      "createdAt": "2024-01-16T14:22:00Z"
+    }
+  ],
+  "documents": [
+    {
+      "id": 1,
+      "userId": 1,
+      "title": "My Professional Resume",
+      "content": "EXPERIENCE: 5 years in software development. SKILLS: JavaScript, React, Node.js, Express, MongoDB. EDUCATION: Bachelor's in Computer Science.",
+      "templateId": 1,
+      "createdAt": "2024-01-15T10:35:00Z"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "title": "Cover Letter - Google",
+      "content": "Dear Hiring Manager, I am interested in the Frontend Developer position at Google. With my experience in building scalable web applications...",
+      "templateId": 2,
+      "createdAt": "2024-01-16T09:15:00Z"
+    },
+    {
+      "id": 3,
+      "userId": 2,
+      "title": "Alpha's Resume",
+      "content": "EXPERIENCE: 8 years in full-stack development. SKILLS: Java, Spring Boot, React, PostgreSQL. PROJECTS: E-commerce platform, Analytics dashboard.",
+      "templateId": 1,
+      "createdAt": "2024-01-17T11:00:00Z"
+    }
+  ],
+  "templates": [
+    {
+      "id": 1,
+      "name": "Modern",
+      "description": "Clean and modern resume template with minimalist design",
+      "category": "simple",
+      "content": "<html><body><h1>Resume</h1><p>Professional resume template</p></body></html>",
+      "createdAt": "2024-01-10T08:00:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Creative",
+      "description": "Creative and colorful template for designers and artists",
+      "category": "designer",
+      "content": "<html><body style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);'><h1>Creative Resume</h1></body></html>",
+      "createdAt": "2024-01-11T08:00:00Z"
+    },
+    {
+      "id": 3,
+      "name": "Classic",
+      "description": "Classic professional template with traditional layout",
+      "category": "premium",
+      "content": "<html><body><h1>Professional Resume</h1><h2>Experience</h2><ul><li>Work Experience</li></ul></body></html>",
+      "createdAt": "2024-01-12T08:00:00Z"
+    }
+  ],
+  "applications": [
+    {
+      "id": 1,
+      "userId": 1,
+      "companyName": "Google",
+      "position": "Frontend Developer",
+      "status": "Applied",
+      "appliedDate": "2024-01-15T15:30:00Z",
+      "createdAt": "2024-01-15T15:30:00Z"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "companyName": "Microsoft",
+      "position": "Senior Developer",
+      "status": "Interview",
+      "appliedDate": "2024-01-14T10:15:00Z",
+      "createdAt": "2024-01-14T10:15:00Z"
+    },
+    {
+      "id": 3,
+      "userId": 1,
+      "companyName": "Amazon",
+      "position": "Software Engineer",
+      "status": "Rejected",
+      "appliedDate": "2024-01-10T12:00:00Z",
+      "createdAt": "2024-01-10T12:00:00Z"
+    },
+    {
+      "id": 4,
+      "userId": 2,
+      "companyName": "Meta",
+      "position": "Full Stack Developer",
+      "status": "Applied",
+      "appliedDate": "2024-01-17T13:45:00Z",
+      "createdAt": "2024-01-17T13:45:00Z"
+    }
+  ]
 }
