@@ -193,7 +193,7 @@ This project follows a structured architecture with separation of concerns:
 Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/resume-api.git
+git clone https://github.com/inf0chan/resume-api.git
 ```
 
 Move inside the project
