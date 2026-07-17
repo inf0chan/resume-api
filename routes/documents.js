@@ -1,10 +1,32 @@
+/**
+ * Document Routes
+ * Handles resume document management endpoints:
+ * - List all documents
+ * - Create new document
+ * - Import document
+ * - Get specific document
+ * - Update document
+ * - Delete document
+ */
+
 const express = require("express");
 const router = express.Router();
+
+/**
+ * GET /api/documents
+ * Retrieve all user documents
+ */
 router.get("/", (req, res) => {
   res.json({
     message: "All Documents",
   });
 });
+
+/**
+ * POST /api/documents
+ * Create a new document
+ * Body: { title, content, templateId }
+ */
 router.post("/", (req, res) => {
   const newDocument = req.body;
 
@@ -14,12 +36,22 @@ router.post("/", (req, res) => {
   });
 });
 
+/**
+ * POST /api/documents/import
+ * Import document from external source
+ * Body: { file or url }
+ */
 router.post("/import", (req, res) => {
   res.status(201).json({
     message: "Document imported successfully",
   });
 });
 
+/**
+ * GET /api/documents/:id
+ * Retrieve specific document by ID
+ * Params: id (document ID)
+ */
 router.get("/:id", (req, res) => {
   const id = req.params.id;
 
@@ -31,6 +63,12 @@ router.get("/:id", (req, res) => {
   });
 });
 
+/**
+ * PUT /api/documents/:id
+ * Update document by ID
+ * Params: id (document ID)
+ * Body: { title, content }
+ */
 router.put("/:id", (req, res) => {
   const id = req.params.id;
 
@@ -43,9 +81,15 @@ router.put("/:id", (req, res) => {
   });
 });
 
+/**
+ * DELETE /api/documents/:id
+ * Delete document by ID
+ * Params: id (document ID)
+ */
 router.delete("/:id", (req, res) => {
   res.status(204).json({
     message: "id deleted successfully"
   });
 });
+
 module.exports = router;

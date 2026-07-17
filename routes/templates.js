@@ -1,6 +1,18 @@
+/**
+ * Template Routes
+ * Handles resume template management endpoints:
+ * - List all available templates
+ * - Get specific template details
+ */
+
 const express = require("express");
 const router = express.Router();
 
+/**
+ * GET /api/templates
+ * Retrieve all available resume templates
+ * Returns: Array of template objects with id, name, category
+ */
 router.get("/", (req, res) => {
   res.status(200).json({
     message: "templates listing successfully",
@@ -24,6 +36,12 @@ router.get("/", (req, res) => {
   });
 });
 
+/**
+ * GET /api/templates/:id
+ * Retrieve specific template by ID
+ * Params: id (template ID)
+ * Returns: Template object with details
+ */
 router.get("/:id", (req, res) => {
   const id = req.params.id;
 

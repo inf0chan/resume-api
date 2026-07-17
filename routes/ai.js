@@ -1,6 +1,21 @@
+/**
+ * AI Routes
+ * Handles AI-powered resume enhancement endpoints:
+ * - Generate bullet points
+ * - Create AI summary
+ * - Rewrite text
+ * - Custom AI prompts
+ */
+
 const express = require("express");
 const router = express.Router();
 
+/**
+ * POST /api/ai/bullets
+ * Generate optimized bullet points from text
+ * Body: { text }
+ * Returns: { original, result }
+ */
 router.post("/bullets", (req, res) => {
   const { text } = req.body;
 
@@ -10,6 +25,12 @@ router.post("/bullets", (req, res) => {
   });
 });
 
+/**
+ * POST /api/ai/summary
+ * Generate AI-powered summary of text
+ * Body: { text }
+ * Returns: { original, summary }
+ */
 router.post("/summary", (req, res) => {
   const { text } = req.body;
 
@@ -19,6 +40,12 @@ router.post("/summary", (req, res) => {
   });
 });
 
+/**
+ * POST /api/ai/rewrite
+ * Rewrite and improve text for better impact
+ * Body: { text }
+ * Returns: { original, rewritten }
+ */
 router.post("/rewrite", (req, res) => {
   const { text } = req.body;
 
@@ -28,6 +55,12 @@ router.post("/rewrite", (req, res) => {
   });
 });
 
+/**
+ * POST /api/ai/prompt
+ * Send custom prompt to AI and get response
+ * Body: { prompt }
+ * Returns: { prompt, response }
+ */
 router.post("/prompt", (req, res) => {
   const { prompt } = req.body;
 

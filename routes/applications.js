@@ -1,7 +1,21 @@
+/**
+ * Application Routes
+ * Handles job application tracking endpoints:
+ * - List all applications
+ * - Create new application record
+ * - Update application status
+ * - Delete application
+ */
+
 const express = require("express");
 
 const router = express.Router();
 
+/**
+ * GET /api/applications
+ * Retrieve all job applications for user
+ * Returns: Array of application objects
+ */
 router.get("/", (req, res) => {
   res.status(200).json({
     applications: [
@@ -15,6 +29,11 @@ router.get("/", (req, res) => {
   });
 });
 
+/**
+ * POST /api/applications
+ * Create new job application record
+ * Body: { company, position, status, appliedDate }
+ */
 router.post("/", (req, res) => {
   const application = req.body;
 
@@ -24,6 +43,12 @@ router.post("/", (req, res) => {
   });
 });
 
+/**
+ * PATCH /api/applications/:id
+ * Update application status or details
+ * Params: id (application ID)
+ * Body: { status, notes, appliedDate }
+ */
 router.patch("/:id", (req, res) => {
   const id = req.params.id;
 
@@ -36,6 +61,11 @@ router.patch("/:id", (req, res) => {
   });
 });
 
+/**
+ * DELETE /api/applications/:id
+ * Delete application record
+ * Params: id (application ID)
+ */
 router.delete("/:id", (req, res) => {
   res.status(204).send();
 });
