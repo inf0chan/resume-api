@@ -1,171 +1,183 @@
-/**
- * Authentication Controller
- * Handles user authentication operations:
- * - Registration: Create new user accounts
- * - Login: Authenticate existing users
- * - Password Management: Reset and recovery functionality
- */
+const { User } = require("../models");
+const jwt = require("jsonwebtoken");
 
-const User = require("../models/User");
+// Helper to generate the JWT token and profile object
+function generateAuthData(user) {
+  const profile = {
+    id: user.id,
+    email: user.email,
+    name: user.name
+  };
 
-// Helper function to validate required fields
-function validateRequiredFields(fields, fieldNames) {
-  for (const field of fieldNames) {
-    if (!fields[field]) {
-      return `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
-    }
-  }
-  return null;
-}
-
-// Helper function to send error response
-function sendErrorResponse(res, status, error) {
-  return res.status(status).json({ error });
-}
-
-// Helper function to send success response
-function sendSuccessResponse(res, status, message, data = {}) {
-  return res.status(status).json({
-    message,
-    ...data,
+  const token = jwt.sign(profile, process.env.JWT_SECRET, {
+    expiresIn: "7d",
   });
+
+  return { token, user: profile };
 }
 
 /**
- * Auth controller object with handler methods
+ * Register a new user
+ * @param {*} req
+ * @param {*} res
  */
-const authController = {
-  // Handle user registration
-  register: (req, res) => {
-    try {
-      const { email, password, name } = req.body;
+async function register(req, res) {
+  try {
+    const { name, email, password } = req.body;
 
-      // Validate required fields
-      const validationError = validateRequiredFields(
-        { email, password, name },
-        ["email", "password", "name"]
-      );
-      if (validationError) {
-        return sendErrorResponse(res, 400, validationError);
-      }
-
-      // Check if user already exists
-      const existingUser = User.getByEmail(email);
-      if (existingUser) {
-        return sendErrorResponse(res, 409, "User already exists");
-      }
-
-      // Create new user
-      const newUser = User.create({
-        name,
-        email,
-        password, // In production, hash this password
-        plan: "Free",
-        aiCredits: 25,
+    if (!name || !email || !password) {
+      return res.status(400).send({
+        success: false,
+        message: "Name, email and password are required.",
       });
-
-      sendSuccessResponse(res, 201, "User Registered", { user: newUser });
-    } catch (error) {
-      sendErrorResponse(res, 500, error.message);
     }
-  },
 
-  // Handle user login
-  login: (req, res) => {
-    try {
-      const { email, password } = req.body;
-
-      // Validate required fields
-      const validationError = validateRequiredFields(
-        { email, password },
-        ["email", "password"]
-      );
-      if (validationError) {
-        return sendErrorResponse(res, 400, validationError);
-      }
-
-      // Find user by email
-      const user = User.getByEmail(email);
-      if (!user) {
-        return sendErrorResponse(res, 401, "Invalid credentials");
-      }
-
-      // Verify password (in production, use bcrypt)
-      if (user.password !== password) {
-        return sendErrorResponse(res, 401, "Invalid credentials");
-      }
-
-      sendSuccessResponse(res, 200, "Login Successful", { user });
-    } catch (error) {
-      sendErrorResponse(res, 500, error.message);
-    }
-  },
-
-  // Handle user logout
-  logout: (req, res) => {
-    try {
-      sendSuccessResponse(res, 200, "Logout Successful");
-    } catch (error) {
-      sendErrorResponse(res, 500, error.message);
-    }
-  },
-
-  // Handle forgot password request
-  forgetPassword: (req, res) => {
-    try {
-      const { email } = req.body;
-
-      // Validate email
-      const validationError = validateRequiredFields(
-        { email },
-        ["email"]
-      );
-      if (validationError) {
-        return sendErrorResponse(res, 400, validationError);
-      }
-
-      // Check if user exists
-      const user = User.getByEmail(email);
-      if (!user) {
-        return sendErrorResponse(res, 404, "User not found");
-      }
-
-      sendSuccessResponse(res, 200, "Password reset link sent to email");
-    } catch (error) {
-      sendErrorResponse(res, 500, error.message);
-    }
-  },
-
-  // Handle password reset with token
-  resetPassword: (req, res) => {
-    try {
-      const { email, token, newPassword } = req.body;
-
-      // Validate required fields
-      const validationError = validateRequiredFields(
-        { email, token, newPassword },
-        ["email", "token", "newPassword"]
-      );
-      if (validationError) {
-        return sendErrorResponse(res, 400, validationError);
-      }
-
-      // Find user
-      const user = User.getByEmail(email);
-      if (!user) {
-        return sendErrorResponse(res, 404, "User not found");
-      }
-
-      // Update password
-      User.update(user.id, {
-        password: newPassword, // In production, hash this password
+    const existingUser = await User.count({ where: { email } });
+    if (existingUser) {
+      return res.status(409).send({
+        success: false,
+        message: "Email already registered.",
       });
-
-      sendSuccessResponse(res, 200, "Password reset successfully");
-    } catch (error) {
-      sendErrorResponse(res, 500, error.message);
     }
-  },
+
+    const user = await User.create({ name, email, password });
+    
+    const authData = generateAuthData(user);
+
+    return res.status(201).json({
+      success: true,
+      message: "User registered successfully.",
+      data: authData
+    });
+  } catch (error) {
+    console.log("error in register", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to register user.",
+    });
+  }
+}
+
+/**
+ * Login user
+ * @param {*} req
+ * @param {*} res
+ */
+async function login(req, res) {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).send({
+        success: false,
+        message: "Email and password are required.",
+      });
+    }
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid email or password.",
+      });
+    }
+
+    const isMatch = await user.checkPassword(password);
+
+    if (!isMatch) {
+      return res.status(401).send({
+        success: false,
+        message: "Invalid email or password.",
+      });
+    }
+
+    const authData = generateAuthData(user);
+
+    return res.status(200).json({
+      success: true,
+      message: "User logged in successfully",
+      data: authData
+    });
+  } catch (error) {
+    console.log("error in login", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to login.",
+    });
+  }
+}
+
+/**
+ * Logout user
+ * @param {*} req
+ * @param {*} res
+ */
+function logout(req, res) {
+  try {
+    res.status(200).send({
+      success: true,
+      message: "Logged out successfully.",
+    });
+  } catch (error) {
+    console.log("error in logout", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to logout.",
+    });
+  }
+}
+
+/**
+ * Forgot password
+ * @param {*} req
+ * @param {*} res
+ */
+function forgotPassword(req, res) {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).send({
+        success: false,
+        message: "Email is required.",
+      });
+    }
+    res.status(200).send({
+      success: true,
+      message: "Password reset link sent to " + email,
+    });
+  } catch (error) {
+    console.log("error in forgotPassword", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to send reset link.",
+    });
+  }
+}
+
+/**
+ * Reset password
+ * @param {*} req
+ * @param {*} res
+ */
+function resetPassword(req, res) {
+  try {
+    res.status(200).send({
+      success: true,
+      message: "Password reset successful.",
+    });
+  } catch (error) {
+    console.log("error in resetPassword", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to reset password.",
+    });
+  }
+}
+
+module.exports = {
+  register,
+  login,
+  logout,
+  forgotPassword,
+  resetPassword,
 };
-
-module.exports = authController;

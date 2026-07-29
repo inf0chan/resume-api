@@ -10,7 +10,7 @@ const app = express();
 // Middleware for parsing JSON request bodies
 app.use(express.json());
 
-// Health check endpoint
+//endpoint
 app.get("/", (req, res) => {
   res.json({
     message: "APIs is Running!"

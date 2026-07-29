@@ -1,126 +1,165 @@
-/**
- * Document Controller
- * Manages resume document operations:
- * - CRUD operations for documents
- * - Document retrieval and filtering
- * - Content management
- */
+const { Document } = require("../models");
 
-const Document = require("../models/Document");
-
-// Helper function to send error response
-function sendErrorResponse(res, status, error) {
-  return res.status(status).json({ error });
-}
-
-// Helper function to send success response
-function sendSuccessResponse(res, status, message, data = {}) {
-  return res.status(status).json({
-    message,
-    ...data,
-  });
-}
-
-// Helper function to validate document fields
-function validateDocumentFields(title, content) {
-  if (!title || title.trim() === "") {
-    return "Title is required";
+async function list(req, res) {
+  try {
+    const documents = await Document.findAll();
+    res.send({
+      success: true,
+      message: "Retrieved the list of documents.",
+      documents: documents,
+    });
+  } catch (error) {
+    console.log("error in list", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to retrieve the list of documents.",
+    });
   }
-  if (!content || content.trim() === "") {
-    return "Content is required";
-  }
-  return null;
 }
 
-/**
- * Document controller object with handler methods
- */
-const documentController = {
-  // Retrieve all documents
-  getAll: (req, res) => {
-    try {
-      const documents = Document.getAll();
-      sendSuccessResponse(res, 200, "Documents retrieved", { documents });
-    } catch (error) {
-      sendErrorResponse(res, 500, error.message);
-    }
-  },
+async function create(req, res) {
+  try {
+    const document = req.body;
+    const created = await Document.create(document);
+    res.status(201).send({
+      success: true,
+      message: "Document created.",
+      document: created,
+    });
+  } catch (error) {
+    console.log("error in create", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to create document.",
+    });
+  }
+}
 
-  // Retrieve specific document by ID
-  getById: (req, res) => {
-    try {
-      const { id } = req.params;
-      const document = Document.getById(parseInt(id));
-
-      if (!document) {
-        return sendErrorResponse(res, 404, "Document not found");
-      }
-
-      sendSuccessResponse(res, 200, "Document retrieved", { document });
-    } catch (error) {
-      sendErrorResponse(res, 500, error.message);
-    }
-  },
-
-  // Create new document
-  create: (req, res) => {
-    try {
-      const { title, content, templateId } = req.body;
-
-      // Validate document fields
-      const validationError = validateDocumentFields(title, content);
-      if (validationError) {
-        return sendErrorResponse(res, 400, validationError);
-      }
-
-      // Create new document
-      const newDocument = Document.create({
-        title,
-        content,
-        templateId,
-        userId: req.query.userId || 1,
+async function findOne(req, res) {
+  try {
+    const id = req.params.id;
+    const document = await Document.findByPk(id);
+    if (!document) {
+      return res.status(404).send({
+        success: false,
+        message: "Document not found.",
       });
+    }
+    res.send({
+      success: true,
+      message: "Retrieved the document.",
+      document,
+    });
+  } catch (error) {
+    console.log("error in findOne", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to retrieve the document.",
+    });
+  }
+}
 
-      sendSuccessResponse(res, 201, "Document created successfully", {
-        document: newDocument,
+async function update(req, res) {
+  try {
+    const id = req.params.id;
+    const document = await Document.findByPk(id);
+    if (!document) {
+      return res.status(404).send({
+        success: false,
+        message: "Document not found.",
       });
-    } catch (error) {
-      sendErrorResponse(res, 500, error.message);
     }
-  },
+    await document.update(req.body);
+    res.send({
+      success: true,
+      message: "Document updated.",
+      document,
+    });
+  } catch (error) {
+    console.log("error in update", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to update document.",
+    });
+  }
+}
 
-  // Update document by ID
-  update: (req, res) => {
-    try {
-      const { id } = req.params;
-      const updates = req.body;
-
-      // Update document
-      const updatedDocument = Document.update(parseInt(id), updates);
-
-      if (!updatedDocument) {
-        return sendErrorResponse(res, 404, "Document not found");
-      }
-
-      sendSuccessResponse(res, 200, "Document updated successfully", {
-        document: updatedDocument,
+async function remove(req, res) {
+  try {
+    const id = req.params.id;
+    const document = await Document.findByPk(id);
+    if (!document) {
+      return res.status(404).send({
+        success: false,
+        message: "Document not found.",
       });
-    } catch (error) {
-      sendErrorResponse(res, 500, error.message);
     }
-  },
+    await document.destroy();
+    res.status(204).send();
+  } catch (error) {
+    console.log("error in remove", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to remove document.",
+    });
+  }
+}
 
-  // Delete document by ID
-  delete: (req, res) => {
-    try {
-      const { id } = req.params;
-      Document.delete(parseInt(id));
-
-      sendSuccessResponse(res, 204, "Document deleted successfully");
-    } catch (error) {
-      sendErrorResponse(res, 500, error.message);
+async function duplicate(req, res) {
+  try {
+    const id = req.params.id;
+    const document = await Document.findByPk(id);
+    if (!document) {
+      return res.status(404).send({
+        success: false,
+        message: "Document not found.",
+      });
     }
-  },
+    const copy = {
+      title: document.title + " (Copy)",
+      type: document.type,
+      userId: document.userId,
+      templateId: document.templateId,
+    };
+    const createdCopy = await Document.create(copy);
+    res.status(201).send({
+      success: true,
+      message: "Document duplicated.",
+      document: createdCopy,
+    });
+  } catch (error) {
+    console.log("error in duplicate", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to duplicate document.",
+    });
+  }
+}
+
+async function importDocument(req, res) {
+  try {
+    const document = req.body;
+    const created = await Document.create(document);
+    res.status(201).send({
+      success: true,
+      message: "Document imported.",
+      document: created,
+    });
+  } catch (error) {
+    console.log("error in importDocument", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to import document.",
+    });
+  }
+}
+
+module.exports = {
+  list,
+  create,
+  findOne,
+  update,
+  remove,
+  duplicate,
+  importDocument,
 };
-
-module.exports = documentController;

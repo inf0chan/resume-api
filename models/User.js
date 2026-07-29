@@ -1,75 +1,69 @@
-/**
- * User Model
- * Handles all user-related data operations
- * Acts as a wrapper around database methods for user collection
- */
+"use strict";
+const { Model } = require("sequelize");
+const bcrypt = require("bcrypt");
 
-const db = require("../db");
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    static associate(models) {
+      User.hasMany(models.Document, {
+        foreignKey: "userId",
+        onDelete: "CASCADE",
+      });
+      User.hasMany(models.Application, {
+        foreignKey: "userId",
+        onDelete: "CASCADE",
+      });
+      User.hasMany(models.Export, {
+        foreignKey: "userId",
+        onDelete: "CASCADE",
+      });
+    }
 
-// Helper functions for user CRUD operations
-function getAllUsers() {
-  return db.getAllUsers();
-}
-
-function getUserById(id) {
-  return db.getUserById(id);
-}
-
-function createNewUser(userData) {
-  return db.createUser(userData);
-}
-
-function updateExistingUser(id, updates) {
-  return db.updateUser(id, updates);
-}
-
-function deleteExistingUser(id) {
-  return db.deleteUser(id);
-}
-
-// Helper function to find user by field
-function findUserByField(field, value) {
-  return getAllUsers().find((user) => user[field] === value);
-}
-
-/**
- * User class - manages user data persistence and retrieval
- */
-class User {
-  // Retrieve all users from database
-  static getAll() {
-    return getAllUsers();
+    checkPassword(plainText) {
+      return bcrypt.compare(plainText, this.password);
+    }
   }
 
-  // Retrieve specific user by ID
-  static getById(id) {
-    return getUserById(id);
-  }
+  User.init(
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          isEmail: true,
+        },
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          min: 8,
+        },
+      },
+      tier: {
+        type: DataTypes.ENUM("free", "pro"),
+        defaultValue: "free",
+      },
+      aiCredits: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+    },
+    {
+      sequelize,
+      modelName: "User",
+    },
+  );
 
-  // Create new user with provided data
-  static create(userData) {
-    return createNewUser(userData);
-  }
+  User.beforeCreate(async (user) => {
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
+  });
 
-  // Update user information by ID
-  static update(id, updates) {
-    return updateExistingUser(id, updates);
-  }
-
-  // Delete user by ID
-  static delete(id) {
-    return deleteExistingUser(id);
-  }
-
-  // Find user by email address
-  static getByEmail(email) {
-    return findUserByField("email", email);
-  }
-
-  // Generic find by field method
-  static findBy(field, value) {
-    return findUserByField(field, value);
-  }
-}
-
-module.exports = User;
+  return User;
+};

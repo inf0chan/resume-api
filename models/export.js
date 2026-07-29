@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Template extends Model {
+  class Export extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -9,21 +9,21 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Template.hasMany(models.Document, {
-        foreignKey: "templateId",
-        onDelete: "SET NULL",
-      });
+      Export.belongsTo(models.User, { foreignKey: "userId" });
+      Export.belongsTo(models.Document, { foreignKey: "documentId" });
     }
   }
-  Template.init(
+  Export.init(
     {
-      name: DataTypes.STRING,
-      config: DataTypes.TEXT,
+      format: DataTypes.ENUM("pdf", "docx"),
+      fileUrl: DataTypes.STRING,
+      documentId: DataTypes.INTEGER,
+      userId: DataTypes.INTEGER,
     },
     {
       sequelize,
-      modelName: "Template",
+      modelName: "Export",
     },
   );
-  return Template;
+  return Export;
 };

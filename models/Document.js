@@ -1,75 +1,50 @@
-/**
- * Document Model
- * Manages resume documents and related data operations
- * Provides methods for document CRUD and user-specific queries
- */
+"use strict";
+const { Model } = require("sequelize");
+module.exports = (sequelize, DataTypes) => {
+  class Document extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+      Document.belongsTo(models.User, { foreignKey: "userId" });
+      Document.belongsTo(models.Template, { foreignKey: "templateId" });
 
-const db = require("../db");
-
-// Helper functions for document CRUD operations
-function getAllDocuments() {
-  return db.getAllDocuments();
-}
-
-function getDocumentById(id) {
-  return db.getDocumentById(id);
-}
-
-function createNewDocument(documentData) {
-  return db.createDocument(documentData);
-}
-
-function updateExistingDocument(id, updates) {
-  return db.updateDocument(id, updates);
-}
-
-function deleteExistingDocument(id) {
-  return db.deleteDocument(id);
-}
-
-// Helper function to find documents by field
-function findDocumentsByField(field, value) {
-  return getAllDocuments().filter((doc) => doc[field] === value);
-}
-
-/**
- * Document class - handles resume document persistence
- */
-class Document {
-  // Get all documents
-  static getAll() {
-    return getAllDocuments();
+      Document.hasMany(models.Section, {
+        foreignKey: "documentId",
+        onDelete: "CASCADE",
+      });
+      Document.hasMany(models.Version, {
+        foreignKey: "documentId",
+        onDelete: "CASCADE",
+      });
+      Document.hasMany(models.Application, {
+        foreignKey: "documentId",
+        onDelete: "CASCADE",
+      });
+      Document.hasOne(models.Share, {
+        foreignKey: "documentId",
+        onDelete: "CASCADE",
+      });
+      Document.hasMany(models.Export, {
+        foreignKey: "documentId",
+        onDelete: "CASCADE",
+      });
+    }
   }
-
-  // Get document by ID
-  static getById(id) {
-    return getDocumentById(id);
-  }
-
-  // Create new document
-  static create(documentData) {
-    return createNewDocument(documentData);
-  }
-
-  // Update document by ID
-  static update(id, updates) {
-    return updateExistingDocument(id, updates);
-  }
-
-  // Delete document by ID
-  static delete(id) {
-    return deleteExistingDocument(id);
-  }
-
-  // Get all documents for specific user
-  static getByUserId(userId) {
-    return findDocumentsByField("userId", userId);
-  }
-
-  // Generic find by field method
-  static findBy(field, value) {
-    return findDocumentsByField(field, value);
-  }
-}
-
-module.exports = Document;
+  Document.init(
+    {
+      title: DataTypes.STRING,
+      type: DataTypes.ENUM("resume", "cover_letter"),
+      userId: DataTypes.INTEGER,
+      templateId: DataTypes.INTEGER,
+    },
+    {
+      sequelize,
+      modelName: "Document",
+    },
+  );
+  return Document;
+};
