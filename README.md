@@ -64,7 +64,13 @@ As a learning repository, it is valuable to keep a history of how the code evolv
 - Use **Sequelize ORM** to automate schema migrations and query generation.
 - Build a scalable backend structure.
 
+<<<<<<< HEAD
 ---
+=======
+```bash
+git clone https://github.com/inf0chan/resume-api.git
+```
+>>>>>>> 83c60563678bc10a2283b0fa7dac00d7a18c93a5
 
 ## 📌 Current Progress
 
